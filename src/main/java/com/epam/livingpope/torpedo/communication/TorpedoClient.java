@@ -1,0 +1,154 @@
+package com.epam.livingpope.torpedo.communication;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import com.epam.livingpope.torpedo.Game;
+import com.epam.livingpope.torpedo.shapes.Point;
+import com.epam.livingpope.torpedo.shapes.Table;
+import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+
+public class TorpedoClient extends DefaultMessages {
+    private static final int TABLE_SIZE = 20;
+    private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
+    private final Game game = createGame();
+
+    private Game createGame() {
+        return new Game(new RandomTargetingSystem(new Table(TABLE_SIZE, TABLE_SIZE)));
+    }
+
+    public TorpedoClient(Socket socket, PrintWriter out, BufferedReader in) {
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        checkParameters(args);
+
+        String hostName = args[0];
+        int portNumber = Integer.parseInt(args[1]);
+
+        TorpedoClient client = null;
+        try {
+            Socket socket = createSocket(hostName, portNumber);
+            PrintWriter out = createWriter(socket);
+            BufferedReader in = createReader(socket);
+
+            client = new TorpedoClient(socket, out, in);
+            client.playTheGame();
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host " + hostName);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("I/O connection failed at " + hostName);
+            System.exit(1);
+        } finally {
+            if (client != null) {
+                client.closeSocket();
+            }
+        }
+    }
+
+    private static void checkParameters(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: java TorpedoClient <host name> <port number>");
+            System.exit(1);
+        }
+    }
+
+    private static BufferedReader createReader(Socket socket) throws IOException {
+        return new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    }
+
+    private static PrintWriter createWriter(Socket socket) throws IOException {
+        return new PrintWriter(socket.getOutputStream(), true);
+    }
+
+    private static Socket createSocket(String hostName, int portNumber) throws UnknownHostException, IOException {
+        return new Socket(hostName, portNumber);
+    }
+
+    private void closeSocket() throws IOException {
+        socket.close();
+    }
+
+    private void playTheGame() throws IOException {
+        startGame();
+        String input;
+        while ((input = in.readLine()) != null) {
+            handleInput(input);
+        }
+    }
+
+    private void startGame() {
+        greeting(TABLE_SIZE);
+        Point firstTarget = game.firstTarget();
+        fire(firstTarget.x, firstTarget.y);
+    }
+
+    private void handleInput(String input) throws IOException {
+        if (input.startsWith(FIRE)) {
+            handleFire(input);
+            nextFire();
+        } else if (input.equals(HIT)) {
+            game.onHit();
+        } else if (input.equals(MISS)) {
+            game.onMiss();
+        } else if (input.equals(SUNK)) {
+            game.onSunk();
+        } else if (input.equals(WIN)) {
+            System.err.println(GAME_WON);
+            onEndOfGame();
+        }
+    }
+
+    private void nextFire() {
+        Point nextTarget = game.nextTarget();
+        fire(nextTarget.x, nextTarget.y);
+    }
+
+    private void onEndOfGame() throws IOException {
+        System.err.println(END_OF_THE_GAME);
+        sendMessage(THANKS_FOR_THE_GAME);
+        game.printResult();
+        closeSocket();
+    }
+
+    private void handleFire(String input) throws IOException {
+        Status status = getStatusOnFire(input);
+        if (status.equals(Status.HIT)) {
+            hit();
+        } else if (status.equals(Status.MISS)) {
+            miss();
+        } else if (status.equals(Status.SUNK)) {
+            sunk();
+            game.printTable();
+        } else if (status.equals(Status.WIN)) {
+            System.err.println(GAME_LOST);
+            win();
+            onEndOfGame();
+        }
+    }
+
+    private Status getStatusOnFire(String input) {
+        String[] split = input.split(SEPARATOR);
+        int x = Integer.parseInt(split[1]);
+        int y = Integer.parseInt(split[2]);
+        Status status = game.fire(new Point(x, y));
+        return status;
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        out.println(message);
+    }
+
+}
