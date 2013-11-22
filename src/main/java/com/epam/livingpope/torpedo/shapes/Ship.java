@@ -5,20 +5,24 @@ import java.util.Collections;
 
 public class Ship implements Hittable {
 
-    private final ArrayList<Field> shipFieldList = new ArrayList<>();
+    private final ArrayList<Point> shipPointList = new ArrayList<>();
     private final ShipShape shape;
+    private final int offsetX;
+    private final int offsetY;
 
     public Ship(ShipShape shape, int offsetX, int offsetY) {
         this.shape = shape;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
         createShipFieldList(shape, offsetX, offsetY);
     }
 
     private void createShipFieldList(ShipShape shape, int offsetX, int offsetY) {
-        Field[][] fields = shape.fields;
+        FieldState[][] fields = shape.fields;
         for(int rowIndex=0;rowIndex<fields[0].length;rowIndex++) {
             for(int colIndex=0;colIndex<fields.length;colIndex++) {
                 if(FieldState.UNHIT_SHIP.equals(fields[rowIndex][colIndex])) {
-                    shipFieldList.add(new Field(new Point(rowIndex + offsetY, colIndex + offsetX), FieldState.UNHIT_SHIP));
+                    shipPointList.add(new Point(rowIndex + offsetY, colIndex + offsetX));
                 }
             }
         }
@@ -26,58 +30,30 @@ public class Ship implements Hittable {
 
     @Override
     public boolean isHittable(Point point) {
-        boolean result = false;
-        for (Field field : shipFieldList) {
-            if(field.isHittable(point)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
+        return shipPointList.contains(point);
     }
 
     @Override
     public void hit(Point point) {
-        for (Field field : shipFieldList) {
-            if(field.isHittable(point)) {
-                field.hit(point);
-                break;
-            }
+        if(!shipPointList.contains(point)) {
+            throw new UnsupportedOperationException("This point cannot be hit " + point);
         }
-    }
-
-    @Override
-    public boolean isUnHit() {
-        boolean result = false;
-        for (Field field : shipFieldList) {
-            if(!field.isUnHit()) {
-                result = false;
-                break;
-            }
-        }
-        return result;
+        shipPointList.remove(point);
     }
 
     public boolean isSunk() {
-        boolean result = false;
-        for (Field field : shipFieldList) {
-            if(field.isUnHit()) {
-                result = false;
-                break;
-            }
-        }
-        return result;
+        return shipPointList.isEmpty();
     }
 
     public boolean hasConflictWithShip(Ship ship) {
-        return !Collections.disjoint(shipFieldList, ship.shipFieldList);
+        return !Collections.disjoint(shipPointList, ship.shipPointList);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((shipFieldList == null) ? 0 : shipFieldList.hashCode());
+        result = prime * result + ((shipPointList == null) ? 0 : shipPointList.hashCode());
         return result;
     }
 
@@ -90,17 +66,17 @@ public class Ship implements Hittable {
         if (getClass() != obj.getClass())
             return false;
         Ship other = (Ship) obj;
-        if (shipFieldList == null) {
-            if (other.shipFieldList != null)
+        if (shipPointList == null) {
+            if (other.shipPointList != null)
                 return false;
-        } else if (!shipFieldList.equals(other.shipFieldList))
+        } else if (!shipPointList.equals(other.shipPointList))
             return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "Ship [pointList=" + shipFieldList + "]";
+        return "Ship [pointList=" + shipPointList + "]";
     }
 
 }
