@@ -2,7 +2,7 @@ package com.epam.livingpope.torpedo.torpedo;
 
 import java.util.ArrayList;
 
-import com.epam.livingpope.torpedo.communication.BulletStatus;
+import com.epam.livingpope.torpedo.communication.GameStatus;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;
 
@@ -16,18 +16,18 @@ public class RandomTorpedo implements Torpedo {
         tableWithShips = createTableWithShips(tableWidth, tableHeight);
     }
 
-    public BulletStatus fire(Point target) {
-        BulletStatus result = BulletStatus.MISS;
+    public GameStatus fire(Point target) {
+        GameStatus result = GameStatus.MISS;
         for (Ship ship : ships) {
             if (ship.hasPoint(target)) {
                 if (hitShip(target, ship)) {
-                    result = BulletStatus.SUNK;
+                    result = GameStatus.SUNK;
                     System.err.println(ships.size());
                 } else {
-                    result = BulletStatus.HIT;
+                    result = GameStatus.HIT;
                 }
                 if (isGameOver()) {
-                    result = BulletStatus.WIN;
+                    result = GameStatus.WIN;
                 }
                 break;
             }

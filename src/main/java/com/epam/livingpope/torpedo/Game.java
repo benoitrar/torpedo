@@ -3,10 +3,9 @@ package com.epam.livingpope.torpedo;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.epam.livingpope.torpedo.communication.BulletStatus;
+import com.epam.livingpope.torpedo.communication.GameStatus;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;
-import com.epam.livingpope.torpedo.shapes.ShipBuilder;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 import com.epam.livingpope.torpedo.torpedo.RandomTorpedo;
 import com.epam.livingpope.torpedo.torpedo.Torpedo;
@@ -73,24 +72,6 @@ public class Game {
         }
     }
 
-    @SuppressWarnings("unused")
-    private ArrayList<Ship> createShips() {
-        ArrayList<Ship> result = new ArrayList<Ship>();
-        for (int i = 0; i < 4; i++) {
-            Ship ship = targetingSystem.generateShip();
-            while (hasConflictWithOthers(ship, result)) {
-                ship = targetingSystem.generateShip();
-            }
-            result.add(ship);
-        }
-        return result;
-    }
-
-    private ArrayList<Ship> readShips() {
-        ShipBuilder sb = new ShipBuilder(targetingSystem);
-        return sb.shipsFromFile(DEFAULT_FILE_FOR_SHIPS);
-    }
-
     private boolean hasConflictWithOthers(Ship ship, List<Ship> shipList) {
         boolean result = false;
         for (Ship ourShip : shipList) {
@@ -109,11 +90,11 @@ public class Game {
         printResult();
     }
 
-    public BulletStatus getStatusOnFire(Point target) {
+    public GameStatus getStatusOnFire(Point target) {
         fireCounter++;
         firedPoints.add(target);
-        BulletStatus status = torpedo.fire(target);
-        if (status.equals(BulletStatus.WIN)) {
+        GameStatus status = torpedo.fire(target);
+        if (status.equals(GameStatus.WIN)) {
             printResult();
         }
         return status;

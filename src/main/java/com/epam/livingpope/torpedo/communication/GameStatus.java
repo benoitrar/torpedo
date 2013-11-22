@@ -1,5 +1,5 @@
 package com.epam.livingpope.torpedo.communication;
 
-public enum BulletStatus {
+public enum GameStatus {
     HIT, MISS, SUNK, WIN;
 }

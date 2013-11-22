@@ -117,26 +117,26 @@ public class TorpedoClient extends DefaultMessages {
     }
 
     private void handleFire(String input) throws IOException {
-        BulletStatus status = getStatusOnFire(input);
-        if (status.equals(BulletStatus.HIT)) {
+        GameStatus status = getStatusOnFire(input);
+        if (status.equals(GameStatus.HIT)) {
             hit();
-        } else if (status.equals(BulletStatus.MISS)) {
+        } else if (status.equals(GameStatus.MISS)) {
             miss();
-        } else if (status.equals(BulletStatus.SUNK)) {
+        } else if (status.equals(GameStatus.SUNK)) {
             sunk();
             game.printTable();
-        } else if (status.equals(BulletStatus.WIN)) {
+        } else if (status.equals(GameStatus.WIN)) {
             System.err.println(GAME_LOST);
             win();
             onEndOfGame();
         }
     }
 
-    private BulletStatus getStatusOnFire(String input) {
+    private GameStatus getStatusOnFire(String input) {
         String[] split = input.split(SEPARATOR);
         int x = Integer.parseInt(split[1]);
         int y = Integer.parseInt(split[2]);
-        BulletStatus status = game.getStatusOnFire(new Point(x, y));
+        GameStatus status = game.getStatusOnFire(new Point(x, y));
         return status;
     }
 
