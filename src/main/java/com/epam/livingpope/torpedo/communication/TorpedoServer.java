@@ -8,8 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.epam.livingpope.torpedo.Game;
+import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
-import com.epam.livingpope.torpedo.shapes.Table;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class TorpedoServer extends DefaultMessages {
@@ -103,7 +103,15 @@ public class TorpedoServer extends DefaultMessages {
     private void createGame(String input) {
         String[] split = input.split(SEPARATOR);
         int tableSize = Integer.parseInt(split[1]);
-        game = new Game(new RandomTargetingSystem(new Table(tableSize, tableSize)));
+        game = createGame(tableSize, tableSize);
+    }
+    
+    private Game createGame(int tableWidth, int tableHeight) {
+        return new Game(
+                new RandomTargetingSystem(
+                        new GameBoard.Builder(tableWidth, tableHeight)
+                        .readShipsFromFile(TorpedoClient.SHIP_FILE_LOC)
+                        .build()));
     }
 
     private void onEndOfGame() throws IOException {
