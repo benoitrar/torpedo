@@ -8,11 +8,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.epam.livingpope.torpedo.Game;
+import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
-import com.epam.livingpope.torpedo.shapes.Table;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class TorpedoClient extends DefaultMessages {
+    public static final String SHIP_FILE_LOC = "D:/prj/_torpedo-contest/torpedo/resources/test.in";
     private static final int TABLE_SIZE = 20;
     private Socket socket;
     private PrintWriter out;
@@ -147,7 +148,11 @@ public class TorpedoClient extends DefaultMessages {
     }
 
     private Game createGame() {
-        return new Game(new RandomTargetingSystem(new Table(TABLE_SIZE, TABLE_SIZE)));
+        return new Game(
+                new RandomTargetingSystem(
+                        new GameBoard.Builder(TABLE_SIZE, TABLE_SIZE)
+                        .readShipsFromFile(SHIP_FILE_LOC)
+                        .build()));
     }
 
     @Override
