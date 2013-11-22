@@ -16,13 +16,12 @@ public class TorpedoServer extends DefaultMessages {
     private static final String CLIENT_SHIP_SUNK = "client: sunk";
     private static final String CLIENT_SHIP_HIT = "client: hit";
     private ServerSocket serverSocket;
-    private static Socket clientSocket;
+    private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private Game game;
-    private int firecounter = 0;
-
-    public TorpedoServer(ServerSocket serverSocket, PrintWriter out, BufferedReader in) {
+    
+    public TorpedoServer(ServerSocket serverSocket, Socket clientSocket, PrintWriter out, BufferedReader in) {
         this.serverSocket = serverSocket;
         this.out = out;
         this.in = in;
@@ -35,8 +34,13 @@ public class TorpedoServer extends DefaultMessages {
         int portNumber = Integer.parseInt(args[0]);
 
         TorpedoServer torpedoServer = null;
-        try {
-            torpedoServer = createTorpedoServer(portNumber);
+        try (
+            ServerSocket serverSocket = new ServerSocket(portNumber);
+            Socket clientSocket = serverSocket.accept();
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        ){
+            torpedoServer = new TorpedoServer(serverSocket, clientSocket, out, in);
             torpedoServer.playTheGame();
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection");
@@ -56,8 +60,12 @@ public class TorpedoServer extends DefaultMessages {
     }
 
     private void closeSockets() throws IOException {
-        clientSocket.close();
-        serverSocket.close();
+        if(clientSocket != null) {
+            clientSocket.close();
+        }
+        if(serverSocket != null) {
+            serverSocket.close();
+        }
     }
 
     private void playTheGame() throws IOException {
@@ -72,7 +80,7 @@ public class TorpedoServer extends DefaultMessages {
             createGame(input);
         } else if (input.startsWith(FIRE)) {
             handleFire(input);
-            nextFire();
+            fireBack();
         } else if (input.equals(HIT)) {
             System.out.println(CLIENT_SHIP_HIT);
             game.onHit();
@@ -87,7 +95,7 @@ public class TorpedoServer extends DefaultMessages {
         }
     }
 
-    private void nextFire() {
+    private void fireBack() {
         Point nextTarget = game.nextTarget();
         fire(nextTarget.x, nextTarget.y);
     }
@@ -106,36 +114,27 @@ public class TorpedoServer extends DefaultMessages {
     }
 
     private void handleFire(String input) throws IOException {
-        Status status = getStatusOnFire(input);
-        if (status.equals(Status.HIT)) {
+        BulletStatus status = getStatusOnFire(input);
+        if (status.equals(BulletStatus.HIT)) {
             hit();
-        } else if (status.equals(Status.MISS)) {
+        } else if (status.equals(BulletStatus.MISS)) {
             miss();
-        } else if (status.equals(Status.SUNK)) {
+        } else if (status.equals(BulletStatus.SUNK)) {
             sunk();
             game.printTable();
-        } else if (status.equals(Status.WIN)) {
+        } else if (status.equals(BulletStatus.WIN)) {
             System.err.println(GAME_LOST);
             win();
             onEndOfGame();
         }
     }
 
-    private Status getStatusOnFire(String input) {
+    private BulletStatus getStatusOnFire(String input) {
         String[] split = input.split(SEPARATOR);
         int x = Integer.parseInt(split[1]);
         int y = Integer.parseInt(split[2]);
-        Status status = game.fire(new Point(x, y));
+        BulletStatus status = game.getStatusOnFire(new Point(x, y));
         return status;
-    }
-
-    private static TorpedoServer createTorpedoServer(int portNumber) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(portNumber);
-        clientSocket = serverSocket.accept();
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        return new TorpedoServer(serverSocket, out, in);
     }
 
     @Override

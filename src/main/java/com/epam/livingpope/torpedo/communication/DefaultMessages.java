@@ -31,7 +31,6 @@ public abstract class DefaultMessages implements Messages {
     }
 
     public void sunk() {
-        System.err.println("me: sunk");
         sendMessage(SUNK);
     }
 

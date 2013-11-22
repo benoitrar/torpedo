@@ -3,7 +3,7 @@ package com.epam.livingpope.torpedo;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.epam.livingpope.torpedo.communication.Status;
+import com.epam.livingpope.torpedo.communication.BulletStatus;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;
 import com.epam.livingpope.torpedo.shapes.ShipBuilder;
@@ -104,16 +104,16 @@ public class Game {
     public void startGame() {
         while (!torpedo.isGameOver()) {
             Point point = targetingSystem.generatePoint();
-            fire(point);
+            getStatusOnFire(point);
         }
         printResult();
     }
 
-    public Status fire(Point target) {
+    public BulletStatus getStatusOnFire(Point target) {
         fireCounter++;
         firedPoints.add(target);
-        Status status = torpedo.fire(target);
-        if (status.equals(Status.WIN)) {
+        BulletStatus status = torpedo.fire(target);
+        if (status.equals(BulletStatus.WIN)) {
             printResult();
         }
         return status;

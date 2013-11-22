@@ -114,7 +114,9 @@ public class RandomTargetingSystem implements TargetingSystem {
             potentialShipPoints = getPotentialShipPoints(hitPoint);
             suspiciousPoints.addAll(potentialShipPoints);
         } else {
-            potentialShipPoints.addAll(getPotentialShipPoints(lastTarget));
+            List<Point> newPotentialShipPoints = getPotentialShipPoints(lastTarget);
+            potentialShipPoints.addAll(newPotentialShipPoints);
+            suspiciousPoints.addAll(newPotentialShipPoints);
         }
     }
 

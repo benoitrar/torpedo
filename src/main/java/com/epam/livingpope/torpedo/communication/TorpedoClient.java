@@ -19,10 +19,6 @@ public class TorpedoClient extends DefaultMessages {
     private BufferedReader in;
     private final Game game = createGame();
 
-    private Game createGame() {
-        return new Game(new RandomTargetingSystem(new Table(TABLE_SIZE, TABLE_SIZE)));
-    }
-
     public TorpedoClient(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
         this.out = out;
@@ -37,11 +33,11 @@ public class TorpedoClient extends DefaultMessages {
         int portNumber = Integer.parseInt(args[1]);
 
         TorpedoClient client = null;
-        try {
+        try (
             Socket socket = createSocket(hostName, portNumber);
             PrintWriter out = createWriter(socket);
             BufferedReader in = createReader(socket);
-
+        ) {
             client = new TorpedoClient(socket, out, in);
             client.playTheGame();
         } catch (UnknownHostException e) {
@@ -82,10 +78,7 @@ public class TorpedoClient extends DefaultMessages {
 
     private void playTheGame() throws IOException {
         startGame();
-        String input;
-        while ((input = in.readLine()) != null) {
-            handleInput(input);
-        }
+        handleInputs();
     }
 
     private void startGame() {
@@ -94,10 +87,17 @@ public class TorpedoClient extends DefaultMessages {
         fire(firstTarget.x, firstTarget.y);
     }
 
+    private void handleInputs() throws IOException {
+        String input;
+        while ((input = in.readLine()) != null) {
+            handleInput(input);
+        }
+    }
+
     private void handleInput(String input) throws IOException {
         if (input.startsWith(FIRE)) {
             handleFire(input);
-            nextFire();
+            fireBack();
         } else if (input.equals(HIT)) {
             game.onHit();
         } else if (input.equals(MISS)) {
@@ -110,40 +110,44 @@ public class TorpedoClient extends DefaultMessages {
         }
     }
 
-    private void nextFire() {
+    private void fireBack() {
         Point nextTarget = game.nextTarget();
         fire(nextTarget.x, nextTarget.y);
     }
 
-    private void onEndOfGame() throws IOException {
-        System.err.println(END_OF_THE_GAME);
-        sendMessage(THANKS_FOR_THE_GAME);
-        game.printResult();
-        closeSocket();
-    }
-
     private void handleFire(String input) throws IOException {
-        Status status = getStatusOnFire(input);
-        if (status.equals(Status.HIT)) {
+        BulletStatus status = getStatusOnFire(input);
+        if (status.equals(BulletStatus.HIT)) {
             hit();
-        } else if (status.equals(Status.MISS)) {
+        } else if (status.equals(BulletStatus.MISS)) {
             miss();
-        } else if (status.equals(Status.SUNK)) {
+        } else if (status.equals(BulletStatus.SUNK)) {
             sunk();
             game.printTable();
-        } else if (status.equals(Status.WIN)) {
+        } else if (status.equals(BulletStatus.WIN)) {
             System.err.println(GAME_LOST);
             win();
             onEndOfGame();
         }
     }
 
-    private Status getStatusOnFire(String input) {
+    private BulletStatus getStatusOnFire(String input) {
         String[] split = input.split(SEPARATOR);
         int x = Integer.parseInt(split[1]);
         int y = Integer.parseInt(split[2]);
-        Status status = game.fire(new Point(x, y));
+        BulletStatus status = game.getStatusOnFire(new Point(x, y));
         return status;
+    }
+
+    private void onEndOfGame() throws IOException {
+        sendMessage(THANKS_FOR_THE_GAME);
+        System.err.println(END_OF_THE_GAME);
+        game.printResult();
+        closeSocket();
+    }
+
+    private Game createGame() {
+        return new Game(new RandomTargetingSystem(new Table(TABLE_SIZE, TABLE_SIZE)));
     }
 
     @Override
