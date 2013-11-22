@@ -2,9 +2,9 @@ package com.epam.livingpope.torpedo.shapes;
 
 public class ShipShape {
 
-    public final Field[][] fields;
+    public final FieldState[][] fields;
 
-    public ShipShape(Field[][] fields) {
+    public ShipShape(FieldState[][] fields) {
         this.fields = fields;
     }
     
@@ -13,8 +13,8 @@ public class ShipShape {
         fields = createFieldsWithValidValues(values);
     }
 
-    private Field[][] createFieldsWithValidValues(boolean[][] values) {
-        Field fields[][] = new Field[values[0].length][values.length];
+    private FieldState[][] createFieldsWithValidValues(boolean[][] values) {
+        FieldState fields[][] = new FieldState[values[0].length][values.length];
         for(int i=0;i<values[0].length;i++) {
             for(int j=0;j<values.length;j++) {
                 fields[i][j] = createInitialFieldFromValue(values, i, j);
@@ -23,12 +23,12 @@ public class ShipShape {
         return fields;
     }
 
-    private Field createInitialFieldFromValue(boolean[][] values, int i, int j) {
-        Field field;
+    private FieldState createInitialFieldFromValue(boolean[][] values, int i, int j) {
+        FieldState field;
         if(values[i][j]) {
-            field = new Field(FieldState.UNHIT_SHIP);
+            field = FieldState.UNHIT_SHIP;
         } else {
-            field = new Field(FieldState.EMPTY);
+            field = FieldState.EMPTY;
         }
         return field;
     }
