@@ -1,4 +1,4 @@
-package com.epam.livingpope.torpedo.target;
+package com.epam.livingpope.torpedo.targeting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,6 @@ public class RandomTargetingSystem implements TargetingSystem {
 
     private Point createStartPointForShip(int shipWidth, int shipHeight) {
         Point point = generatePoint();
-        // TODO check coordinates
         while (!table.isOnTable(point.x + shipWidth, point.y + shipHeight)) {
             point = generatePoint();
         }
@@ -84,24 +83,28 @@ public class RandomTargetingSystem implements TargetingSystem {
     public Point nextTarget() {
         lastTarget = calculateNextTarget();
         firedPoints.add(lastTarget);
-        // System.err.println(lastTarget);
         return lastTarget;
     }
 
     private Point calculateNextTarget() {
-        Point nextTarget;
+        Point nextTarget = nextTargetTip();
 
+        while (firedPoints.contains(nextTarget)) {
+            nextTarget = nextTargetTip();
+        }
+
+        return nextTarget;
+    }
+
+    private Point nextTargetTip() {
+        Point nextTarget;
         if (!potentialShipPoints.isEmpty()) {
             nextTarget = potentialShipPoints.remove(0);
         } else if (!suspiciousPoints.isEmpty()) {
             nextTarget = suspiciousPoints.remove(0);
         } else {
             nextTarget = generatePoint();
-            while (firedPoints.contains(nextTarget)) {
-                nextTarget = generatePoint();
-            }
         }
-
         return nextTarget;
     }
 

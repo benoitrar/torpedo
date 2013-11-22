@@ -1,10 +1,12 @@
 package com.epam.livingpope.torpedo.shapes;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class ShipBuilder {
 
@@ -28,6 +30,9 @@ public class ShipBuilder {
                     boolean[][] shape = createShape(reader);
                     for (int i = 0; i < shipCount; i++) {
                         Ship generateShip = targetingSystem.generateShip(shape);
+                        while (hasConflictWithOthers(generateShip, ships)) {
+                            generateShip = targetingSystem.generateShip(shape);
+                        }
                         System.out.println(generateShip);
                         ships.add(generateShip);
                     }
@@ -58,6 +63,16 @@ public class ShipBuilder {
             }
         }
         return shipFileShape;
+    }
+
+    private boolean hasConflictWithOthers(Ship ship, List<Ship> shipList) {
+        boolean result = false;
+        for (Ship ourShip : shipList) {
+            if (ourShip.hasConflictWithShip(ship)) {
+                result = true;
+            }
+        }
+        return result;
     }
 
 }

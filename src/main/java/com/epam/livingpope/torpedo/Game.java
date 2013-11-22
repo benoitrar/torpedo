@@ -7,13 +7,13 @@ import com.epam.livingpope.torpedo.communication.Status;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;
 import com.epam.livingpope.torpedo.shapes.ShipBuilder;
-import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 import com.epam.livingpope.torpedo.torpedo.RandomTorpedo;
 import com.epam.livingpope.torpedo.torpedo.Torpedo;
 
 public class Game {
 
-    private static final String DEFAULT_FILE_FOR_SHIPS = "D:/prj/clean-pair/torpedo/resources/test.in";
+    private static final String DEFAULT_FILE_FOR_SHIPS = "C:/Users/Benedek_Kiss@epam.com/Desktop/ships2.txt";
     private Torpedo torpedo;
     private RandomTargetingSystem targetingSystem;
     private List<Point> firedPoints = new ArrayList<>();
@@ -29,26 +29,45 @@ public class Game {
     public void printTable() {
         int tableWidth = targetingSystem.getTableWidth();
         int tableHeight = targetingSystem.getTableHeight();
-        char[][] tableWithShips = torpedo.getTableWithShips(tableWidth, tableHeight);
-        addFiredPoints(tableWithShips);
+        char[][] tableWithShips = torpedo.getTableWithShips();
 
-        printTable(tableWidth, tableHeight, tableWithShips);
+        char[][] tableWithShipsAndFiredPoints = addFiredPoints(tableWithShips);
+
+        printTable(tableWidth, tableHeight, tableWithShipsAndFiredPoints);
     }
 
-    private void addFiredPoints(char[][] table) {
+    private char[][] addFiredPoints(char[][] table) {
+        char tableWithFiredPoints[][] = copy(table);
         for (Point point : firedPoints) {
-            if (table[point.x][point.y] == 'X') {
-                table[point.x][point.y] = '#';
+            if (tableWithFiredPoints[point.x][point.y] == Point.SHIP_POINT) {
+                tableWithFiredPoints[point.x][point.y] = Point.HIT_SHIP_POINT;
             } else {
-                table[point.x][point.y] = 'O';
+                tableWithFiredPoints[point.x][point.y] = Point.MISSED_POINT;
             }
         }
+        return tableWithFiredPoints;
+    }
+
+    private char[][] copy(char[][] table) {
+        char[][] copy = new char[table[0].length][table.length];
+
+        for (int i = 0; i < table[0].length; i++) {
+            for (int j = 0; j < table.length; j++) {
+                copy[i][j] = table[i][j];
+            }
+        }
+
+        return copy;
     }
 
     private void printTable(int tableWidth, int tableHeight, char[][] table) {
         for (int i = 0; i < tableWidth; i++) {
             for (int j = 0; j < tableHeight; j++) {
-                System.out.print(" " + table[i][j] + " ");
+                if (table[i][j] == Point.HIT_SHIP_POINT || table[i][j] == Point.SHIP_POINT) {
+                    System.err.print(" " + table[i][j] + " ");
+                } else {
+                    System.out.print(" " + table[i][j] + " ");
+                }
             }
             System.out.print("\n");
         }

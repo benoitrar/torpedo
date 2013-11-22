@@ -5,9 +5,10 @@ import com.epam.livingpope.torpedo.shapes.Point;
 
 public interface Torpedo {
     Status fire(Point target);
-    
-    public char[][] getTableWithShips(int tableWidth, int tableHeight);
-    //void printAllShips(int tableWidth, int tableHeight);
+
+    public char[][] getTableWithShips();
+
+    // void printAllShips(int tableWidth, int tableHeight);
 
     boolean isGameOver();
 }

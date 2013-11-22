@@ -1,4 +1,4 @@
-package com.epam.livingpope.torpedo.target;
+package com.epam.livingpope.torpedo.targeting;
 
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;

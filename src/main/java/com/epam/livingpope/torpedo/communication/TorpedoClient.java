@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import com.epam.livingpope.torpedo.Game;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Table;
-import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class TorpedoClient extends DefaultMessages {
     private static final int TABLE_SIZE = 20;

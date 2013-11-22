@@ -2,6 +2,11 @@ package com.epam.livingpope.torpedo.shapes;
 
 public class Point {
 
+    public static final char EMPTY_POINT = ' ';
+    public static final char MISSED_POINT = '.';
+    public static final char SHIP_POINT = 'O';
+    public static final char HIT_SHIP_POINT = '#';
+
     public final int x;
     public final int y;
 
@@ -11,7 +16,7 @@ public class Point {
     }
 
     public Point addPoint(Point otherPoint) {
-        return new Point(x + otherPoint.x, otherPoint.y);
+        return new Point(x + otherPoint.x, y + otherPoint.y);
     }
 
     @Override

@@ -22,6 +22,7 @@ public class RandomTorpedo implements Torpedo {
             if (ship.hasPoint(target)) {
                 if (hitShip(target, ship)) {
                     result = Status.SUNK;
+                    System.err.println(ships.size());
                 } else {
                     result = Status.HIT;
                 }
@@ -44,6 +45,15 @@ public class RandomTorpedo implements Torpedo {
         return sunk;
     }
 
+    @SuppressWarnings("unused")
+    private void printShips() {
+        System.out.println("--------------------------");
+        for (Ship ship : ships) {
+            System.out.println(ship);
+        }
+        System.out.println("--------------------------");
+    }
+
     public boolean isGameOver() {
         boolean result = false;
         if (ships.isEmpty()) {
@@ -62,14 +72,14 @@ public class RandomTorpedo implements Torpedo {
         return table;
     }
 
-    public char[][] getTableWithShips(int tableWidth, int tableHeight) {
+    public char[][] getTableWithShips() {
         return tableWithShips;
     }
 
     private void setAllShipPointsForPrint(char[][] table) {
         for (Ship ship : ships) {
             for (Point point : ship.getPointList()) {
-                table[point.x][point.y] = 'X';
+                table[point.x][point.y] = Point.SHIP_POINT;
             }
         }
     }
@@ -77,7 +87,7 @@ public class RandomTorpedo implements Torpedo {
     private void setDefaultValuesForPrint(int tableWidth, int tableHeight, char[][] table) {
         for (int i = 0; i < tableWidth; i++) {
             for (int j = 0; j < tableHeight; j++) {
-                table[i][j] = '.';
+                table[i][j] = Point.EMPTY_POINT;
             }
         }
     }

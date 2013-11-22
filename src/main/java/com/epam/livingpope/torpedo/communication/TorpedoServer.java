@@ -10,7 +10,7 @@ import java.net.Socket;
 import com.epam.livingpope.torpedo.Game;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Table;
-import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class TorpedoServer extends DefaultMessages {
     private static final String CLIENT_SHIP_SUNK = "client: sunk";
@@ -20,6 +20,7 @@ public class TorpedoServer extends DefaultMessages {
     private PrintWriter out;
     private BufferedReader in;
     private Game game;
+    private int firecounter = 0;
 
     public TorpedoServer(ServerSocket serverSocket, PrintWriter out, BufferedReader in) {
         this.serverSocket = serverSocket;

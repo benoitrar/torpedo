@@ -1,7 +1,7 @@
 package com.epam.livingpope.torpedo;
 
 import com.epam.livingpope.torpedo.shapes.Table;
-import com.epam.livingpope.torpedo.target.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 
 public class Main {
 
