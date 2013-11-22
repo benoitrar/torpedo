@@ -21,7 +21,7 @@ public class GameBoard implements Hittable {
         this.height = height;
     }
     
-    static class Builder {
+    public static class Builder {
         private GameBoard board;
         
         public Builder(int width, int height) {
@@ -35,6 +35,22 @@ public class GameBoard implements Hittable {
             Ship ship = getPlaceableShip(shape, offsetX, offsetY);
             board.ships.add(ship);
             return this;
+        }
+        
+        public Builder readShipsFromFile(String fileName) {
+            try (
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            ){
+                processFile(reader);
+            } catch (IOException e) {
+                System.err.println("Error while reading from file " + fileName);
+                e.printStackTrace();
+            }
+            return this;
+        }
+        
+        public GameBoard build() {
+            return board;
         }
 
         private Ship getPlaceableShip(ShipShape shape, int offsetX, int offsetY) {
@@ -54,21 +70,6 @@ public class GameBoard implements Hittable {
                 }
             }
             return result;
-        }
-        
-        public GameBoard build() {
-            return board;
-        }
-        
-        public void readShipsFromFile(String fileName) {
-            try (
-                BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            ){
-                processFile(reader);
-            } catch (IOException e) {
-                System.err.println("Error while reading from file " + fileName);
-                e.printStackTrace();
-            }
         }
 
         private void processFile(BufferedReader reader) throws IOException {
