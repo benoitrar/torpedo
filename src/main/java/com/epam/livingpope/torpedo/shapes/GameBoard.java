@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-
-public class GameBoard {
+public class GameBoard implements Hittable {
     
     private static final char SHIP_POINT = 'X';
     private static final int SHIP_HEIGHT = 4;
@@ -114,5 +113,26 @@ public class GameBoard {
             result = true;
         }
         return result;
+    }
+
+    @Override
+    public boolean isHittable(Point point) {
+        boolean result = false;
+        for (Ship ship : ships) {
+            if(ship.isHittable(point)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void hit(Point point) {
+        for (Ship ship : ships) {
+            if(ship.isHittable(point)) {
+                ship.hit(point);
+                break;
+            }
+        }
     }
 }
