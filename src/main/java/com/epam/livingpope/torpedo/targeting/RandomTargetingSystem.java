@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
-import com.epam.livingpope.torpedo.shapes.Ship;
-import com.epam.livingpope.torpedo.shapes.ShipShape;
-import com.epam.livingpope.torpedo.shapes.Table;
 
 public class RandomTargetingSystem implements TargetingSystem {
     public static final int SHIPMAXLENGTH = 4;
@@ -19,7 +17,7 @@ public class RandomTargetingSystem implements TargetingSystem {
     private static final Point DEFAULT_DIRECTION = EAST;
 
     private final Random random = new Random();
-    private Table table;
+    private GameBoard table;
     private Point lastTarget;
     private Point hitPoint;
     private List<Point> firedPoints = new ArrayList<>();
@@ -27,52 +25,12 @@ public class RandomTargetingSystem implements TargetingSystem {
     private List<Point> suspiciousPoints = new ArrayList<>();
     private Point direction = DEFAULT_DIRECTION;
 
-    public RandomTargetingSystem(Table table) {
+    public RandomTargetingSystem(GameBoard table) {
         this.table = table;
     }
 
-    public Ship generateShip() {
-        boolean[][] shape;
-        if (random.nextBoolean()) {
-            shape = ShipShape.getShipForLength(random.nextInt(SHIPMAXLENGTH) + 1);
-        } else {
-            shape = ShipShape.getSpecialShip();
-        }
-        Point startPoint = createStartPointForShip(shape[0].length, shape.length);
-        ArrayList<Point> pointList = pointListFromShape(startPoint, shape);
-
-        return new Ship(pointList);
-    }
-
-    public Ship generateShip(boolean[][] shape) {
-        Point startPoint = createStartPointForShip(shape[0].length, shape.length);
-        ArrayList<Point> pointList = pointListFromShape(startPoint, shape);
-
-        return new Ship(pointList);
-    }
-
-    private Point createStartPointForShip(int shipWidth, int shipHeight) {
-        Point point = generatePoint();
-        while (!table.isOnTable(point.x + shipWidth, point.y + shipHeight)) {
-            point = generatePoint();
-        }
-        return point;
-    }
-
-    private ArrayList<Point> pointListFromShape(Point point, boolean[][] shape) {
-        ArrayList<Point> pointList = new ArrayList<Point>();
-        for (int rowIndex = 0; rowIndex < shape.length; rowIndex++) {
-            for (int colIndex = 0; colIndex < shape[rowIndex].length; colIndex++) {
-                if (shape[rowIndex][colIndex]) {
-                    pointList.add(new Point(point.x + rowIndex, point.y + colIndex));
-                }
-            }
-        }
-        return pointList;
-    }
-
     public Point generatePoint() {
-        return generatePoint(table.getWidth(), table.getHeight());
+        return generatePoint(table.width, table.height);
     }
 
     public Point generatePoint(int width, int height) {
@@ -168,15 +126,15 @@ public class RandomTargetingSystem implements TargetingSystem {
     }
 
     public Point firstTarget() {
-        lastTarget = new Point(table.getWidth() / 2, table.getHeight() / 2);
+        lastTarget = new Point(table.width / 2, table.height / 2);
         return lastTarget;
     }
 
     public int getTableWidth() {
-        return table.getWidth();
+        return table.width;
     }
 
     public int getTableHeight() {
-        return table.getHeight();
+        return table.height;
     }
 }
