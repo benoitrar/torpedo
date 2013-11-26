@@ -28,7 +28,7 @@ public class ShipShape {
         if(values[i][j]) {
             field = FieldState.UNHIT_SHIP;
         } else {
-            field = FieldState.EMPTY;
+            field = FieldState.UNHIT_EMPTY;
         }
         return field;
     }
