@@ -7,10 +7,11 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.epam.livingpope.torpedo.Game;
+import com.epam.livingpope.torpedo.shapes.FieldState;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.torpedo.CleverTorpedo;
 
 public class TorpedoServer extends DefaultMessages {
     private static final String CLIENT_SHIP_SUNK = "client: sunk";
@@ -19,8 +20,9 @@ public class TorpedoServer extends DefaultMessages {
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-    private Game game;
-    
+    private CleverTorpedo torpedo;
+    private RandomTargetingSystem targetingSystem;
+
     public TorpedoServer(ServerSocket serverSocket, Socket clientSocket, PrintWriter out, BufferedReader in) {
         this.serverSocket = serverSocket;
         this.out = out;
@@ -34,12 +36,10 @@ public class TorpedoServer extends DefaultMessages {
         int portNumber = Integer.parseInt(args[0]);
 
         TorpedoServer torpedoServer = null;
-        try (
-            ServerSocket serverSocket = new ServerSocket(portNumber);
-            Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        ){
+        try (ServerSocket serverSocket = new ServerSocket(portNumber);
+                Socket clientSocket = serverSocket.accept();
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
             torpedoServer = new TorpedoServer(serverSocket, clientSocket, out, in);
             torpedoServer.playTheGame();
         } catch (IOException e) {
@@ -60,10 +60,10 @@ public class TorpedoServer extends DefaultMessages {
     }
 
     private void closeSockets() throws IOException {
-        if(clientSocket != null) {
+        if (clientSocket != null) {
             clientSocket.close();
         }
-        if(serverSocket != null) {
+        if (serverSocket != null) {
             serverSocket.close();
         }
     }
@@ -83,12 +83,12 @@ public class TorpedoServer extends DefaultMessages {
             fireBack();
         } else if (input.equals(HIT)) {
             System.out.println(CLIENT_SHIP_HIT);
-            game.onHit();
+            targetingSystem.onHit();
         } else if (input.equals(MISS)) {
-            game.onMiss();
+            targetingSystem.onMiss();
         } else if (input.equals(SUNK)) {
             System.out.println(CLIENT_SHIP_SUNK);
-            game.onSunk();
+            targetingSystem.onSunk();
         } else if (input.equals(WIN)) {
             System.err.println(GAME_WON);
             onEndOfGame();
@@ -96,28 +96,20 @@ public class TorpedoServer extends DefaultMessages {
     }
 
     private void fireBack() {
-        Point nextTarget = game.nextTarget();
+        Point nextTarget = targetingSystem.nextTarget();
         fire(nextTarget.x, nextTarget.y);
     }
 
     private void createGame(String input) {
         String[] split = input.split(SEPARATOR);
         int tableSize = Integer.parseInt(split[1]);
-        game = createGame(tableSize, tableSize);
-    }
-    
-    private Game createGame(int tableWidth, int tableHeight) {
-        return new Game(
-                new RandomTargetingSystem(
-                        new GameBoard.Builder(tableWidth, tableHeight)
-                        .readShipsFromFile(TorpedoClient.SHIP_FILE_LOC)
-                        .build()));
+        torpedo = new CleverTorpedo.Builder(tableSize, tableSize).readShipsFromFile("d:/ships.txt").build();
+        targetingSystem = new RandomTargetingSystem(new GameBoard(tableSize, tableSize, FieldState.UNSPECIFIED));
     }
 
     private void onEndOfGame() throws IOException {
         System.err.println(END_OF_THE_GAME);
         sendMessage(THANKS_FOR_THE_GAME);
-        game.printResult();
         closeSockets();
     }
 
@@ -129,7 +121,6 @@ public class TorpedoServer extends DefaultMessages {
             miss();
         } else if (status.equals(GameStatus.SUNK)) {
             sunk();
-            game.printTable();
         } else if (status.equals(GameStatus.WIN)) {
             System.err.println(GAME_LOST);
             win();
@@ -141,7 +132,7 @@ public class TorpedoServer extends DefaultMessages {
         String[] split = input.split(SEPARATOR);
         int x = Integer.parseInt(split[1]);
         int y = Integer.parseInt(split[2]);
-        GameStatus status = game.getStatusOnFire(new Point(x, y));
+        GameStatus status = torpedo.getFireResult(new Point(x, y));
         return status;
     }
 

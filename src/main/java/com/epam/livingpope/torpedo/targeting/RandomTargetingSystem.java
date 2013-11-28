@@ -17,7 +17,7 @@ public class RandomTargetingSystem implements TargetingSystem {
     private static final Point DEFAULT_DIRECTION = EAST;
 
     private final Random random = new Random();
-    private GameBoard table;
+    private GameBoard board;
     private Point lastTarget;
     private Point hitPoint;
     private List<Point> firedPoints = new ArrayList<>();
@@ -25,16 +25,16 @@ public class RandomTargetingSystem implements TargetingSystem {
     private List<Point> suspiciousPoints = new ArrayList<>();
     private Point direction = DEFAULT_DIRECTION;
 
-    public RandomTargetingSystem(GameBoard table) {
-        this.table = table;
+    public RandomTargetingSystem(GameBoard board) {
+        this.board = board;
     }
 
     public Point generatePoint() {
-        return generatePoint(table.width, table.height);
+        return generatePoint(board.boardWidth, board.boardHeight);
     }
 
-    public Point generatePoint(int width, int height) {
-        Point point = new Point(random.nextInt(width), random.nextInt(height));
+    public Point generatePoint(int boardWidth, int boardHeight) {
+        Point point = new Point(random.nextInt(boardWidth), random.nextInt(boardHeight));
         return point;
     }
 
@@ -106,19 +106,19 @@ public class RandomTargetingSystem implements TargetingSystem {
         List<Point> resultList = new ArrayList<>();
 
         Point point = shipPoint.addPoint(NORTH);
-        if (table.isOnTable(point)) {
+        if (board.isOnBoard(point)) {
             resultList.add(point);
         }
         point = shipPoint.addPoint(EAST);
-        if (table.isOnTable(point)) {
+        if (board.isOnBoard(point)) {
             resultList.add(point);
         }
         point = shipPoint.addPoint(SOUTH);
-        if (table.isOnTable(point)) {
+        if (board.isOnBoard(point)) {
             resultList.add(point);
         }
         point = shipPoint.addPoint(WEST);
-        if (table.isOnTable(point)) {
+        if (board.isOnBoard(point)) {
             resultList.add(point);
         }
 
@@ -126,15 +126,15 @@ public class RandomTargetingSystem implements TargetingSystem {
     }
 
     public Point firstTarget() {
-        lastTarget = new Point(table.width / 2, table.height / 2);
+        lastTarget = new Point(board.boardWidth / 2, board.boardHeight / 2);
         return lastTarget;
     }
 
-    public int getTableWidth() {
-        return table.width;
+    public int getboardboardWidth() {
+        return board.boardWidth;
     }
 
-    public int getTableHeight() {
-        return table.height;
+    public int getboardboardHeight() {
+        return board.boardHeight;
     }
 }

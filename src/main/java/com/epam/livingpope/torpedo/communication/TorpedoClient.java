@@ -7,10 +7,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.epam.livingpope.torpedo.Game;
+import com.epam.livingpope.torpedo.shapes.FieldState;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
+import com.epam.livingpope.torpedo.torpedo.CleverTorpedo;
 
 public class TorpedoClient extends DefaultMessages {
     public static final String SHIP_FILE_LOC = "D:/prj/_torpedo-contest/torpedo/resources/test.in";
@@ -18,7 +19,8 @@ public class TorpedoClient extends DefaultMessages {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private final Game game = createGame();
+    private CleverTorpedo torpedo;
+    private RandomTargetingSystem targetingSystem;
 
     public TorpedoClient(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
@@ -34,11 +36,7 @@ public class TorpedoClient extends DefaultMessages {
         int portNumber = Integer.parseInt(args[1]);
 
         TorpedoClient client = null;
-        try (
-            Socket socket = createSocket(hostName, portNumber);
-            PrintWriter out = createWriter(socket);
-            BufferedReader in = createReader(socket);
-        ) {
+        try (Socket socket = createSocket(hostName, portNumber); PrintWriter out = createWriter(socket); BufferedReader in = createReader(socket);) {
             client = new TorpedoClient(socket, out, in);
             client.playTheGame();
         } catch (UnknownHostException e) {
@@ -84,7 +82,9 @@ public class TorpedoClient extends DefaultMessages {
 
     private void startGame() {
         greeting(TABLE_SIZE);
-        Point firstTarget = game.firstTarget();
+        torpedo = new CleverTorpedo.Builder(TABLE_SIZE, TABLE_SIZE).readShipsFromFile("d:/ships.txt").build();
+        targetingSystem = new RandomTargetingSystem(new GameBoard(TABLE_SIZE, TABLE_SIZE, FieldState.UNHIT_EMPTY));
+        Point firstTarget = targetingSystem.firstTarget();
         fire(firstTarget.x, firstTarget.y);
     }
 
@@ -100,11 +100,11 @@ public class TorpedoClient extends DefaultMessages {
             handleFire(input);
             fireBack();
         } else if (input.equals(HIT)) {
-            game.onHit();
+            targetingSystem.onHit();
         } else if (input.equals(MISS)) {
-            game.onMiss();
+            targetingSystem.onMiss();
         } else if (input.equals(SUNK)) {
-            game.onSunk();
+            targetingSystem.onSunk();
         } else if (input.equals(WIN)) {
             System.err.println(GAME_WON);
             onEndOfGame();
@@ -112,7 +112,7 @@ public class TorpedoClient extends DefaultMessages {
     }
 
     private void fireBack() {
-        Point nextTarget = game.nextTarget();
+        Point nextTarget = targetingSystem.nextTarget();
         fire(nextTarget.x, nextTarget.y);
     }
 
@@ -124,7 +124,7 @@ public class TorpedoClient extends DefaultMessages {
             miss();
         } else if (status.equals(GameStatus.SUNK)) {
             sunk();
-            game.printTable();
+            // TODO print
         } else if (status.equals(GameStatus.WIN)) {
             System.err.println(GAME_LOST);
             win();
@@ -136,23 +136,15 @@ public class TorpedoClient extends DefaultMessages {
         String[] split = input.split(SEPARATOR);
         int x = Integer.parseInt(split[1]);
         int y = Integer.parseInt(split[2]);
-        GameStatus status = game.getStatusOnFire(new Point(x, y));
+        GameStatus status = torpedo.getFireResult(new Point(x, y));
         return status;
     }
 
     private void onEndOfGame() throws IOException {
         sendMessage(THANKS_FOR_THE_GAME);
         System.err.println(END_OF_THE_GAME);
-        game.printResult();
+        // TODO print result
         closeSocket();
-    }
-
-    private Game createGame() {
-        return new Game(
-                new RandomTargetingSystem(
-                        new GameBoard.Builder(TABLE_SIZE, TABLE_SIZE)
-                        .readShipsFromFile(SHIP_FILE_LOC)
-                        .build()));
     }
 
     @Override
