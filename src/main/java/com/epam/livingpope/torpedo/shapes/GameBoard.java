@@ -42,13 +42,23 @@ public class GameBoard implements Hittable {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
+        printHorizontalLine(sb);
         for (int i = 0; i < boardHeight; i++) {
+            sb.append("|");
             for (int j = 0; j < boardWidth; j++) {
                 sb.append(board[i][j] + " ");
             }
-            sb.append("\n");
+            sb.append("|\n");
         }
+        printHorizontalLine(sb);
         return sb.toString();
+    }
+
+    private void printHorizontalLine(StringBuffer sb) {
+        for (int j = 0; j <= boardWidth; j++) {
+            sb.append("--");
+        }
+        sb.append("\n");
     }
 
     public void add(Ship ship) {

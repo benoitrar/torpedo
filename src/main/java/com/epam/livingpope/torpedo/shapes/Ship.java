@@ -83,4 +83,12 @@ public class Ship implements Hittable {
         return shipPointList;
     }
 
+    public int getWidth() {
+        return shape.getWidth();
+    }
+
+    public int getHeight() {
+        return shape.getHeight();
+    }
+
 }

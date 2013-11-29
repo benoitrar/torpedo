@@ -58,8 +58,8 @@ public class CleverTorpedo implements Torpedo {
             String line = "";
             while ((line = reader.readLine()) != null) {
                 int shipCount = Integer.parseInt(line);
-                FieldState[][] values = getValues(reader);
-                addShips(shipCount, values);
+                ShipShape shipShape = getValues(reader);
+                addShips(shipCount, shipShape);
             }
         }
 
@@ -70,10 +70,9 @@ public class CleverTorpedo implements Torpedo {
         private Ship getPlaceableShip(ShipShape shape) {
             Ship ship;
             Random random = new Random();
-            // TODO could be better
             do {
-                int offsetX = random.nextInt(width - SHIP_WIDTH);
-                int offsetY = random.nextInt(height - SHIP_HEIGHT);
+                int offsetX = random.nextInt(width - shape.getWidth());
+                int offsetY = random.nextInt(height - shape.getHeight());
                 ship = new Ship(shape, offsetX, offsetY);
             } while (conflictsWithOthers(ship));
             return ship;
@@ -90,7 +89,7 @@ public class CleverTorpedo implements Torpedo {
             return result;
         }
 
-        private FieldState[][] getValues(BufferedReader reader) throws IOException {
+        private ShipShape getValues(BufferedReader reader) throws IOException {
             FieldState[][] values = new FieldState[SHIP_WIDTH][SHIP_HEIGHT];
             String line;
             for (int rowIndex = 0; rowIndex < SHIP_WIDTH; rowIndex++) {
@@ -103,12 +102,12 @@ public class CleverTorpedo implements Torpedo {
                     }
                 }
             }
-            return values;
+            return new ShipShape(values);
         }
 
-        private void addShips(int shipCount, FieldState[][] values) {
+        private void addShips(int shipCount, ShipShape shape) {
             for (int counter = 0; counter < shipCount; counter++) {
-                addShip(new ShipShape(values));
+                addShip(shape);
             }
         }
     }
