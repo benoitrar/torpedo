@@ -2,7 +2,7 @@ package com.epam.livingpope.torpedo.shapes;
 
 public enum FieldState {
 
-    UNHIT_EMPTY("."), HIT_EMPTY("O"), UNHIT_SHIP("X"), HIT_SHIP("#"), UNSPECIFIED("?");
+    UNHIT_EMPTY(" "), HIT_EMPTY("."), UNHIT_SHIP("X"), HIT_SHIP("#"), UNSPECIFIED("?");
 
     private String view;
 

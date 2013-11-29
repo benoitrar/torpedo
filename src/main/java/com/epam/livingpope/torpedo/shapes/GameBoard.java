@@ -44,7 +44,7 @@ public class GameBoard implements Hittable {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
-                sb.append(board[i][j]);
+                sb.append(board[i][j] + " ");
             }
             sb.append("\n");
         }

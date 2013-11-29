@@ -9,12 +9,11 @@ import java.util.Random;
 import com.epam.livingpope.torpedo.communication.GameStatus;
 import com.epam.livingpope.torpedo.shapes.FieldState;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
-import com.epam.livingpope.torpedo.shapes.Hittable;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.shapes.Ship;
 import com.epam.livingpope.torpedo.shapes.ShipShape;
 
-public class CleverTorpedo implements Torpedo, Hittable {
+public class CleverTorpedo implements Torpedo {
 
     private static final int SHIP_HEIGHT = 4;
     private static final int SHIP_WIDTH = 4;
@@ -40,8 +39,6 @@ public class CleverTorpedo implements Torpedo, Hittable {
 
         public Builder addShip(ShipShape shape) {
             Ship ship = getPlaceableShip(shape);
-            // TODO board
-            System.out.println(ship);
             torpedo.ships.add(ship);
             torpedo.board.add(ship);
             return this;
@@ -117,48 +114,25 @@ public class CleverTorpedo implements Torpedo, Hittable {
     }
 
     @Override
-    public boolean isHittable(Point point) {
-        boolean result = false;
-        for (Ship ship : ships) {
-            if (ship.isHittable(point)) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void hit(Point point) {
-        for (Ship ship : ships) {
-            if (ship.isHittable(point)) {
-                ship.hit(point);
-                break;
-            }
-        }
-    }
-
-    @Override
     public GameStatus getFireResult(Point target) {
+        board.hit(target);
         GameStatus result = GameStatus.MISS;
         for (Ship ship : ships) {
             if (ship.isHittable(target)) {
                 ship.hit(target);
-                System.out.println("hit: " + target);
                 if (!ship.isSunk()) {
                     result = GameStatus.HIT;
                 } else {
-                    System.out.println("sunk: " + ship);
                     ships.remove(ship);
                     result = GameStatus.SUNK;
+                    System.out.println(board);
                 }
                 if (isGameOver()) {
                     result = GameStatus.WIN;
                 }
-                System.out.println(ships);
                 break;
             }
         }
-        System.out.println(board);
         return result;
     }
 
