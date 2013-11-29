@@ -9,7 +9,7 @@ public class GameBoard implements Hittable {
         this.boardWidth = tableWidth;
         this.boardHeight = tableHeight;
 
-        FieldState[][] board = new FieldState[tableWidth][tableHeight];
+        board = new FieldState[tableWidth][tableHeight];
         for (int i = 0; i < tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
                 board[i][j] = initialState;
@@ -49,6 +49,12 @@ public class GameBoard implements Hittable {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public void add(Ship ship) {
+        for (Point point : ship.getShipPointList()) {
+            board[point.x][point.y] = FieldState.UNHIT_SHIP;
+        }
     }
 
 }

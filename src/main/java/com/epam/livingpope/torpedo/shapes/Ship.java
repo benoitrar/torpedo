@@ -19,9 +19,9 @@ public class Ship implements Hittable {
 
     private void createShipFieldList(ShipShape shape, int offsetX, int offsetY) {
         FieldState[][] fields = shape.fields;
-        for(int rowIndex=0;rowIndex<fields[0].length;rowIndex++) {
-            for(int colIndex=0;colIndex<fields.length;colIndex++) {
-                if(FieldState.UNHIT_SHIP.equals(fields[rowIndex][colIndex])) {
+        for (int rowIndex = 0; rowIndex < fields[0].length; rowIndex++) {
+            for (int colIndex = 0; colIndex < fields.length; colIndex++) {
+                if (FieldState.UNHIT_SHIP.equals(fields[rowIndex][colIndex])) {
                     shipPointList.add(new Point(rowIndex + offsetY, colIndex + offsetX));
                 }
             }
@@ -35,7 +35,7 @@ public class Ship implements Hittable {
 
     @Override
     public void hit(Point point) {
-        if(!shipPointList.contains(point)) {
+        if (!shipPointList.contains(point)) {
             throw new UnsupportedOperationException("This point cannot be hit " + point);
         }
         shipPointList.remove(point);
@@ -77,6 +77,10 @@ public class Ship implements Hittable {
     @Override
     public String toString() {
         return "Ship [pointList=" + shipPointList + "]";
+    }
+
+    public ArrayList<Point> getShipPointList() {
+        return shipPointList;
     }
 
 }

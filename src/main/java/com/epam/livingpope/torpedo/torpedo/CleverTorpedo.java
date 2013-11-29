@@ -41,7 +41,9 @@ public class CleverTorpedo implements Torpedo, Hittable {
         public Builder addShip(ShipShape shape) {
             Ship ship = getPlaceableShip(shape);
             // TODO board
+            System.out.println(ship);
             torpedo.ships.add(ship);
+            torpedo.board.add(ship);
             return this;
         }
 
@@ -73,8 +75,8 @@ public class CleverTorpedo implements Torpedo, Hittable {
             Random random = new Random();
             // TODO could be better
             do {
-                int offsetX = random.nextInt(width);
-                int offsetY = random.nextInt(height);
+                int offsetX = random.nextInt(width - SHIP_WIDTH);
+                int offsetY = random.nextInt(height - SHIP_HEIGHT);
                 ship = new Ship(shape, offsetX, offsetY);
             } while (conflictsWithOthers(ship));
             return ship;
@@ -141,18 +143,22 @@ public class CleverTorpedo implements Torpedo, Hittable {
         for (Ship ship : ships) {
             if (ship.isHittable(target)) {
                 ship.hit(target);
+                System.out.println("hit: " + target);
                 if (!ship.isSunk()) {
                     result = GameStatus.HIT;
                 } else {
+                    System.out.println("sunk: " + ship);
                     ships.remove(ship);
                     result = GameStatus.SUNK;
                 }
                 if (isGameOver()) {
                     result = GameStatus.WIN;
                 }
+                System.out.println(ships);
                 break;
             }
         }
+        System.out.println(board);
         return result;
     }
 
