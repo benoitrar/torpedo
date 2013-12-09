@@ -1,5 +1,8 @@
 package com.epam.livingpope.torpedo.shapes;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,14 +54,24 @@ public class FieldStateTest {
         Assert.assertEquals(expectedResult, result);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetStateOnHitWhenUnspecified() {
+    @Test
+    public void testIsUnhitShipWhenUnhitShip() {
         // GIVEN
-        underTest = FieldState.UNSPECIFIED;
+        underTest = FieldState.UNHIT_SHIP;
         // WHEN
-        underTest.getStateOnHit();
-        // THEN -> UnsupportedOperationException is thrown as UNSPECIFIED field
-        // cannot be hit
+        boolean result = underTest.isUnhitShip();
+        // THEN
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsUnhitShipWhenNotUnhitShip() {
+        // GIVEN
+        underTest = FieldState.UNHIT_EMPTY;
+        // WHEN
+        boolean result = underTest.isUnhitShip();
+        // THEN
+        assertFalse(result);
     }
 
 }
