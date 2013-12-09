@@ -3,4 +3,11 @@
   <groupId>com.epam</groupId>
   <artifactId>clean-code</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.easymock</groupId>
+  		<artifactId>easymock</artifactId>
+  		<version>3.2</version>
+  	</dependency>
+  </dependencies>
 </project>
