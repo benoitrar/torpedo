@@ -1,5 +1,7 @@
 package com.epam.livingpope.torpedo.shapes;
 
+import java.util.Arrays;
+
 public class ShipShape {
 
     public final FieldState[][] fields;
@@ -9,40 +11,50 @@ public class ShipShape {
         this.fields = cutFields;
     }
 
-    private FieldState[][] cutFields(FieldState[][] unCutFields) {
-        FieldState[][] cutFields = cutHorizontally(fields);
-        cutFields = cutVertically(fields);
-        return cutFields;
+    private FieldState[][] cutFields(FieldState[][] fields) {
+        return cutHorizontally(fields);
     }
 
-    private FieldState[][] cutHorizontally(FieldState[][] unCutFields) {
-        for (int i = 0; i < unCutFields.length; i++) {
-            if (isEmptyRow(unCutFields, i)) {
-                unCutFields = deleteEmptyRow(unCutFields, i);
+    private FieldState[][] cutHorizontally(FieldState[][] fields) {
+        FieldState[][] result = fields;
+
+        int rowNum = fields.length;
+        int colNum = fields[0].length;
+        boolean rowsToDelete[] = new boolean[rowNum];
+        Arrays.fill(rowsToDelete, false);
+        int numberOfRowsToDelete = 0;
+
+        for (int rowIndex = 0; rowIndex < fields.length; rowIndex++) {
+            boolean deleteRow = true;
+            for (FieldState fieldState : fields[rowIndex]) {
+                if (fieldState.isUnhitShip()) {
+                    deleteRow = false;
+                    break;
+                }
+            }
+            if (deleteRow) {
+                rowsToDelete[rowIndex] = true;
+                numberOfRowsToDelete++;
             }
         }
-        return unCutFields;
-    }
 
-    private FieldState[][] deleteEmptyRow(FieldState[][] unCutFields, int rowNum) {
-        FieldState[][] result = new FieldState[getWidth(unCutFields) - 1][getHeight(unCutFields)];
-        // TODO
-    }
-
-    private boolean isEmptyRow(FieldState[][] unCutFields, int rowNum) {
-        boolean result = true;
-        for (int colNum = 0; colNum < unCutFields[rowNum].length; colNum++) {
-            if (unCutFields[rowNum][colNum].equals(FieldState.UNHIT_SHIP)) {
-                result = false;
-                break;
+        if (numberOfRowsToDelete != 0) {
+            int newRowNum = fields[0].length - numberOfRowsToDelete;
+            if (newRowNum == 0) {
+                throw new IllegalArgumentException("Shape must not be empty");
+            }
+            result = new FieldState[newRowNum][colNum];
+            int actRow = 0;
+            for (int rowIndex = 0; rowIndex < rowsToDelete.length; rowIndex++) {
+                if (!rowsToDelete[rowIndex]) {
+                    for (FieldState[] fieldStates : fields) {
+                        result[actRow] = fieldStates;
+                    }
+                    actRow++;
+                }
             }
         }
         return result;
-    }
-
-    private FieldState[][] cutVertically(FieldState[][] unCutFields) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public int getWidth(FieldState[][] fields) {
@@ -59,5 +71,20 @@ public class ShipShape {
 
     public int getHeight() {
         return getHeight(fields);
+    }
+
+    // TODO
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (FieldState[] fieldStates : fields) {
+            for (FieldState fieldState : fieldStates) {
+                sb.append(fieldState.toString() + ' ');
+            }
+            sb.append('\n');
+        }
+
+        return sb.toString();
     }
 }

@@ -19,8 +19,8 @@ public class Ship implements Hittable {
 
     private void createShipFieldList(ShipShape shape, int offsetX, int offsetY) {
         FieldState[][] fields = shape.fields;
-        for (int rowIndex = 0; rowIndex < fields[0].length; rowIndex++) {
-            for (int colIndex = 0; colIndex < fields.length; colIndex++) {
+        for (int rowIndex = 0; rowIndex < fields.length; rowIndex++) {
+            for (int colIndex = 0; colIndex < fields[0].length; colIndex++) {
                 if (FieldState.UNHIT_SHIP.equals(fields[rowIndex][colIndex])) {
                     shipPointList.add(new Point(rowIndex + offsetY, colIndex + offsetX));
                 }
