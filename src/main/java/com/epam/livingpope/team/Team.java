@@ -1,3 +1,11 @@
+package com.epam.livingpope.team;
+
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class Team {
     String name;
     int numberOne;
@@ -5,8 +13,8 @@ public class Team {
 
     public Team(String name, int number1, int number2) {
         this.name = name;
-        this.numberOne = number1;
-        this.numberTwo = number2;
+        numberOne = number1;
+        numberTwo = number2;
     }
 
     public Team() {
@@ -18,7 +26,7 @@ public class Team {
     }
 
     public void setNumber2(int number2) {
-        this.numberTwo = number2;
+        numberTwo = number2;
     }
 
     public String getName() {
@@ -34,7 +42,7 @@ public class Team {
     }
 
     public void setNumber1(int number1) {
-        this.numberOne = number1;
+        numberOne = number1;
     }
 
     @Override

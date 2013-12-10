@@ -6,6 +6,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class FieldStateTest {
 
     private FieldState underTest;

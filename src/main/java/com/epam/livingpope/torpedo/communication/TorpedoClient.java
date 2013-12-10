@@ -7,14 +7,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.livingpope.torpedo.shapes.FieldState;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 import com.epam.livingpope.torpedo.torpedo.CleverTorpedo;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class TorpedoClient extends DefaultMessages {
     public static final String SHIP_FILE_LOC = "D:/prj/_torpedo-contest/torpedo/resources/test.in";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TorpedoClient.class);
     private static final int TABLE_SIZE = 20;
     private Socket socket;
     private PrintWriter out;
@@ -36,15 +46,17 @@ public class TorpedoClient extends DefaultMessages {
         int portNumber = Integer.parseInt(args[1]);
 
         TorpedoClient client = null;
-        try (Socket socket = createSocket(hostName, portNumber); PrintWriter out = createWriter(socket); BufferedReader in = createReader(socket);) {
+        try (
+            Socket socket = createSocket(hostName, portNumber);
+            PrintWriter out = createWriter(socket);
+            BufferedReader in = createReader(socket);
+        ) {
             client = new TorpedoClient(socket, out, in);
             client.playTheGame();
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            System.exit(1);
+            LOGGER.error("Don't know about host {}", hostName);
         } catch (IOException e) {
-            System.err.println("I/O connection failed at " + hostName);
-            System.exit(1);
+            LOGGER.error("I/O connection failed at {}", hostName);
         } finally {
             if (client != null) {
                 client.closeSocket();
@@ -54,8 +66,9 @@ public class TorpedoClient extends DefaultMessages {
 
     private static void checkParameters(String[] args) {
         if (args.length != 2) {
-            System.err.println("Usage: java TorpedoClient <host name> <port number>");
-            System.exit(1);
+            String errorMessage = "Usage: java TorpedoClient <host name> <port number>";
+            LOGGER.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 
@@ -85,7 +98,7 @@ public class TorpedoClient extends DefaultMessages {
         torpedo = new CleverTorpedo.Builder(TABLE_SIZE, TABLE_SIZE).readShipsFromFile("d:/ships.txt").build();
         targetingSystem = new RandomTargetingSystem(new GameBoard(TABLE_SIZE, TABLE_SIZE, FieldState.UNHIT_EMPTY));
         Point firstTarget = targetingSystem.firstTarget();
-        fire(firstTarget.x, firstTarget.y);
+        fire(firstTarget.getX(), firstTarget.getY());
     }
 
     private void handleInputs() throws IOException {
@@ -106,14 +119,14 @@ public class TorpedoClient extends DefaultMessages {
         } else if (input.equals(SUNK)) {
             targetingSystem.onSunk();
         } else if (input.equals(WIN)) {
-            System.err.println(GAME_WON);
+            LOGGER.error(GAME_WON);
             onEndOfGame();
         }
     }
 
     private void fireBack() {
         Point nextTarget = targetingSystem.nextTarget();
-        fire(nextTarget.x, nextTarget.y);
+        fire(nextTarget.getX(), nextTarget.getY());
     }
 
     private void handleFire(String input) throws IOException {
@@ -126,7 +139,7 @@ public class TorpedoClient extends DefaultMessages {
             sunk();
             // TODO print
         } else if (status.equals(GameStatus.WIN)) {
-            System.err.println(GAME_LOST);
+            LOGGER.error(GAME_LOST);
             win();
             onEndOfGame();
         }
@@ -142,7 +155,7 @@ public class TorpedoClient extends DefaultMessages {
 
     private void onEndOfGame() throws IOException {
         sendMessage(THANKS_FOR_THE_GAME);
-        System.err.println(END_OF_THE_GAME);
+        LOGGER.error(END_OF_THE_GAME);
         // TODO print result
         closeSocket();
     }

@@ -7,15 +7,23 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.livingpope.torpedo.shapes.FieldState;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
 import com.epam.livingpope.torpedo.targeting.RandomTargetingSystem;
 import com.epam.livingpope.torpedo.torpedo.CleverTorpedo;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class TorpedoServer extends DefaultMessages {
-    private static final String CLIENT_SHIP_SUNK = "client: sunk";
-    private static final String CLIENT_SHIP_HIT = "client: hit";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TorpedoServer.class);
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
@@ -36,15 +44,16 @@ public class TorpedoServer extends DefaultMessages {
         int portNumber = Integer.parseInt(args[0]);
 
         TorpedoServer torpedoServer = null;
-        try (ServerSocket serverSocket = new ServerSocket(portNumber);
-                Socket clientSocket = serverSocket.accept();
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
+        try (
+            ServerSocket serverSocket = new ServerSocket(portNumber);
+            Socket clientSocket = serverSocket.accept();
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
             torpedoServer = new TorpedoServer(serverSocket, clientSocket, out, in);
             torpedoServer.playTheGame();
         } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection");
-            System.out.println(e.getMessage());
+            LOGGER.error("Exception caught when trying to listen on port {} or listening for a connection", portNumber);
+            LOGGER.error(e.getMessage());
         } finally {
             if (torpedoServer != null) {
                 torpedoServer.closeSockets();
@@ -54,8 +63,9 @@ public class TorpedoServer extends DefaultMessages {
 
     private static void checkParameters(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java EchoServer <port number>");
-            System.exit(1);
+            String errorMessage = "Usage: java EchoServer <port number>";
+            LOGGER.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 
@@ -82,22 +92,22 @@ public class TorpedoServer extends DefaultMessages {
             handleFire(input);
             fireBack();
         } else if (input.equals(HIT)) {
-            System.out.println(CLIENT_SHIP_HIT);
+            LOGGER.error(DefaultMessages.CLIENT_SHIP_HIT);
             targetingSystem.onHit();
         } else if (input.equals(MISS)) {
             targetingSystem.onMiss();
         } else if (input.equals(SUNK)) {
-            System.out.println(CLIENT_SHIP_SUNK);
+            LOGGER.error(DefaultMessages.CLIENT_SHIP_SUNK);
             targetingSystem.onSunk();
         } else if (input.equals(WIN)) {
-            System.err.println(GAME_WON);
+            LOGGER.error(GAME_WON);
             onEndOfGame();
         }
     }
 
     private void fireBack() {
         Point nextTarget = targetingSystem.nextTarget();
-        fire(nextTarget.x, nextTarget.y);
+        fire(nextTarget.getX(), nextTarget.getY());
     }
 
     private void createGame(String input) {
@@ -108,7 +118,7 @@ public class TorpedoServer extends DefaultMessages {
     }
 
     private void onEndOfGame() throws IOException {
-        System.err.println(END_OF_THE_GAME);
+        LOGGER.error(END_OF_THE_GAME);
         sendMessage(THANKS_FOR_THE_GAME);
         closeSockets();
     }
@@ -122,7 +132,7 @@ public class TorpedoServer extends DefaultMessages {
         } else if (status.equals(GameStatus.SUNK)) {
             sunk();
         } else if (status.equals(GameStatus.WIN)) {
-            System.err.println(GAME_LOST);
+            LOGGER.error(GAME_LOST);
             win();
             onEndOfGame();
         }

@@ -7,6 +7,12 @@ import java.util.Random;
 import com.epam.livingpope.torpedo.shapes.GameBoard;
 import com.epam.livingpope.torpedo.shapes.Point;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class RandomTargetingSystem implements TargetingSystem {
     public static final int SHIPMAXLENGTH = 4;
 
@@ -25,19 +31,43 @@ public class RandomTargetingSystem implements TargetingSystem {
     private List<Point> suspiciousPoints = new ArrayList<>();
     private Point direction = DEFAULT_DIRECTION;
 
+    /**
+     * Creates a targeting system for the given board.
+     *
+     * @param board
+     *            to be targeted
+     */
     public RandomTargetingSystem(GameBoard board) {
         this.board = board;
     }
 
+    /**
+     * Generates a random point on board.
+     *
+     * @return the random point
+     */
     public Point generatePoint() {
-        return generatePoint(board.boardWidth, board.boardHeight);
+        return generatePoint(board.getBoardWidth(), board.getBoardHeight());
     }
 
+    /**
+     * Generates a random point on a board which bounds are given.
+     *
+     * @param boardWidth
+     *            width of the board
+     * @param boardHeight
+     *            height of the board
+     * @return the random point
+     */
     public Point generatePoint(int boardWidth, int boardHeight) {
-        Point point = new Point(random.nextInt(boardWidth), random.nextInt(boardHeight));
-        return point;
+        return new Point(random.nextInt(boardWidth), random.nextInt(boardHeight));
     }
 
+    /**
+     * Calculates the next target.
+     *
+     * @return the next target
+     */
     public Point nextTarget() {
         lastTarget = calculateNextTarget();
         firedPoints.add(lastTarget);
@@ -66,6 +96,9 @@ public class RandomTargetingSystem implements TargetingSystem {
         return nextTarget;
     }
 
+    /**
+     * Issues necessary actions when the previous result is hit.
+     */
     public void onHit() {
         if (hitPoint == null) {
             hitPoint = lastTarget;
@@ -78,6 +111,9 @@ public class RandomTargetingSystem implements TargetingSystem {
         }
     }
 
+    /**
+     * Issues necessary actions when the previous result is miss.
+     */
     public void onMiss() {
         if (hitPoint != null) {
             direction = rotateDirection(direction);
@@ -85,17 +121,22 @@ public class RandomTargetingSystem implements TargetingSystem {
     }
 
     private Point rotateDirection(Point direction) {
+        Point result;
         if (direction.equals(NORTH)) {
-            return EAST;
+            result = EAST;
         } else if (direction.equals(EAST)) {
-            return SOUTH;
+            result = SOUTH;
         } else if (direction.equals(SOUTH)) {
-            return WEST;
+            result = WEST;
         } else {
-            return NORTH;
+            result = NORTH;
         }
+        return result;
     }
 
+    /**
+     * Issues necessary actions when the previous result is sunk.
+     */
     public void onSunk() {
         hitPoint = null;
         potentialShipPoints.clear();
@@ -125,16 +166,13 @@ public class RandomTargetingSystem implements TargetingSystem {
         return resultList;
     }
 
+    /**
+     * Gives the first target.
+     *
+     * @return the first target
+     */
     public Point firstTarget() {
-        lastTarget = new Point(board.boardWidth / 2, board.boardHeight / 2);
+        lastTarget = new Point(board.getBoardWidth() / 2, board.getBoardHeight() / 2);
         return lastTarget;
-    }
-
-    public int getboardboardWidth() {
-        return board.boardWidth;
-    }
-
-    public int getboardboardHeight() {
-        return board.boardHeight;
     }
 }

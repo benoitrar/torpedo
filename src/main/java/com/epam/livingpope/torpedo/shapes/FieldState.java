@@ -1,8 +1,14 @@
 package com.epam.livingpope.torpedo.shapes;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public enum FieldState {
 
-    UNHIT_EMPTY(" "), HIT_EMPTY("."), UNHIT_SHIP("X"), HIT_SHIP("#"), UNSPECIFIED("?");
+    UNHIT_EMPTY("<"), HIT_EMPTY("."), UNHIT_SHIP("X"), HIT_SHIP("#"), UNSPECIFIED("?");
 
     private String view;
 
@@ -10,6 +16,11 @@ public enum FieldState {
         this.view = view;
     }
 
+    /**
+     * This method gives a way to change inner state legally.
+     *
+     * @return the new state
+     */
     public FieldState getStateOnHit() {
         FieldState stateOnHit;
         switch (this) {
@@ -28,7 +39,7 @@ public enum FieldState {
     }
 
     public boolean isUnhitShip() {
-        return this.equals(UNHIT_SHIP);
+        return equals(UNHIT_SHIP);
     }
 
     @Override

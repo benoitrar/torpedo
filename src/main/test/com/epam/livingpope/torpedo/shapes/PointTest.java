@@ -4,12 +4,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class PointTest {
 
     private Point underTest;
 
     @Before
-    public void setUp() {
+    public void setup() {
         underTest = new Point(1, 1);
     }
 

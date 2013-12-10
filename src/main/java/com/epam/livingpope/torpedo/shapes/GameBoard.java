@@ -1,13 +1,29 @@
 package com.epam.livingpope.torpedo.shapes;
 
-public class GameBoard implements Hittable {
-    private FieldState[][] board;
-    public final int boardWidth;
-    public final int boardHeight;
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
 
+public class GameBoard implements Hittable {
+    private final int boardWidth;
+    private final int boardHeight;
+    private final FieldState[][] board;
+
+    /**
+     * Creates board with given bounds and fills it with the initial state.
+     *
+     * @param tableWidth
+     *            width of the board
+     * @param tableHeight
+     *            height of the board
+     * @param initialState
+     *            initial state to fill the board with
+     */
     public GameBoard(int tableWidth, int tableHeight, FieldState initialState) {
-        this.boardWidth = tableWidth;
-        this.boardHeight = tableHeight;
+        boardWidth = tableWidth;
+        boardHeight = tableHeight;
 
         board = new FieldState[tableWidth][tableHeight];
         for (int i = 0; i < tableHeight; i++) {
@@ -17,8 +33,15 @@ public class GameBoard implements Hittable {
         }
     }
 
+    /**
+     * Check if a given point is on the board.
+     *
+     * @param point
+     *            to be checked
+     * @return true if point is on board
+     */
     public boolean isOnBoard(Point point) {
-        return point.x >= 0 && point.x < boardHeight && point.y >= 0 && point.y < boardWidth;
+        return point.getX() >= 0 && point.getX() < boardHeight && point.getY() >= 0 && point.getY() < boardWidth;
     }
 
     @Override
@@ -26,7 +49,7 @@ public class GameBoard implements Hittable {
         boolean result = true;
         if (!isOnBoard(point)) {
             result = false;
-        } else if (!board[point.x][point.y].isUnhitShip()) {
+        } else if (!board[point.getX()][point.getY()].isUnhitShip()) {
             result = false;
         }
         return result;
@@ -35,7 +58,7 @@ public class GameBoard implements Hittable {
     @Override
     public void hit(Point point) {
         if (isOnBoard(point)) {
-            board[point.x][point.y] = board[point.x][point.y].getStateOnHit();
+            board[point.getX()][point.getY()] = board[point.getX()][point.getY()].getStateOnHit();
         }
     }
 
@@ -61,10 +84,24 @@ public class GameBoard implements Hittable {
         sb.append("\n");
     }
 
+    /**
+     * Adds a new ship to the board.
+     *
+     * @param ship
+     *            to be added
+     */
     public void add(Ship ship) {
         for (Point point : ship.getShipPointList()) {
-            board[point.x][point.y] = FieldState.UNHIT_SHIP;
+            board[point.getX()][point.getY()] = FieldState.UNHIT_SHIP;
         }
+    }
+
+    public int getBoardWidth() {
+        return boardWidth;
+    }
+
+    public int getBoardHeight() {
+        return boardHeight;
     }
 
 }

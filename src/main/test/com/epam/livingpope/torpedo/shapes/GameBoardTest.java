@@ -6,6 +6,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class GameBoardTest {
 
     private GameBoard underTest;
@@ -67,7 +73,7 @@ public class GameBoardTest {
         // GIVEN
         underTest = new GameBoard(20, 20, FieldState.UNHIT_EMPTY);
         Point shipPoint = new Point(10, 10);
-        Ship ship = new Ship(new ShipShape(new FieldState[][] { { FieldState.UNHIT_SHIP } }), 10, 10);
+        Ship ship = new Ship(new ShipShape(new FieldState[][]{{FieldState.UNHIT_SHIP}}), 10, 10);
         Point otherPointOnTable = new Point(0, 0);
         // WHEN
         underTest.add(ship);

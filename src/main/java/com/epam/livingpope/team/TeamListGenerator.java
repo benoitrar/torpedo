@@ -1,10 +1,24 @@
+package com.epam.livingpope.team;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Responsible for generating a pairing of teams.
+ *
+ * @author Livia_Erdelyi
+ */
 public class TeamListGenerator {
-    static List<Integer> numbers = new ArrayList<Integer>();
-    static List<Integer> numbers2 = new ArrayList<Integer>();
+
+    private static final int WEIGHT = 20;
+    private static final int NUMBER_OF_TEAMS = 6;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeamListGenerator.class);
+    private static List<Integer> numbers = new ArrayList<Integer>();
+    private static List<Integer> numbers2 = new ArrayList<Integer>();
 
     public static void main(String[] args) {
 
@@ -17,7 +31,7 @@ public class TeamListGenerator {
         teamList.add(createTeam("O\""));
         teamList.add(createTeam("42"));
 
-        System.out.println(teamList);
+        LOGGER.info("{}", teamList);
 
     }
 
@@ -25,8 +39,8 @@ public class TeamListGenerator {
         Team team = new Team();
 
         team.setName(name);
-        team.setNumber1(generateRandomNumber(20, numbers));
-        team.setNumber2(generateRandomNumber(6, numbers2) + 1);
+        team.setNumber1(generateRandomNumber(WEIGHT, numbers));
+        team.setNumber2(generateRandomNumber(NUMBER_OF_TEAMS, numbers2) + 1);
 
         return team;
     }

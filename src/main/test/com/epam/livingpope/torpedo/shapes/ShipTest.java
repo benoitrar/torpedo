@@ -6,6 +6,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class ShipTest {
 
     private Ship underTest;
@@ -13,7 +19,7 @@ public class ShipTest {
 
     @Before
     public void setup() {
-        underTest = new Ship(new ShipShape(new FieldState[][] { { FieldState.UNHIT_SHIP } }), 10, 10);
+        underTest = new Ship(new ShipShape(new FieldState[][]{{FieldState.UNHIT_SHIP}}), 10, 10);
     }
 
     @Test
@@ -85,7 +91,7 @@ public class ShipTest {
     @Test
     public void testHasConflictWithShipWhenThereIsAConflict() {
         // GIVEN
-        Ship otherShipWithConflict = new Ship(new ShipShape(new FieldState[][] { { FieldState.UNHIT_SHIP } }), 10, 10);
+        Ship otherShipWithConflict = new Ship(new ShipShape(new FieldState[][]{{FieldState.UNHIT_SHIP}}), 10, 10);
         // WHEN
         boolean result = underTest.hasConflictWithShip(otherShipWithConflict);
         // THEN
@@ -95,7 +101,7 @@ public class ShipTest {
     @Test
     public void testHasConflictWithShipWhenThereAreNoConflicts() {
         // GIVEN
-        Ship otherShipWithConflict = new Ship(new ShipShape(new FieldState[][] { { FieldState.UNHIT_SHIP } }), 0, 0);
+        Ship otherShipWithConflict = new Ship(new ShipShape(new FieldState[][]{{FieldState.UNHIT_SHIP}}), 0, 0);
         // WHEN
         boolean result = underTest.hasConflictWithShip(otherShipWithConflict);
         // THEN

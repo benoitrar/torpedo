@@ -6,13 +6,19 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Class for...
+ *
+ * @author Livia_Erdelyi Benedek_Kiss
+ */
+
 public class FieldTest {
 
     private Field underTest;
     private Point point;
 
     @Before
-    public void setUp() {
+    public void setup() {
         point = new Point(2, 2);
     }
 
