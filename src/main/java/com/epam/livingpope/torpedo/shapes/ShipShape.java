@@ -12,11 +12,12 @@ public class ShipShape {
     }
 
     private FieldState[][] cutFields(FieldState[][] fields) {
-        return cutHorizontally(fields);
+        FieldState[][] cutFields = cutHorizontally(fields);
+        return cutVertically(cutFields);
     }
 
     private FieldState[][] cutHorizontally(FieldState[][] fields) {
-        FieldState[][] result = fields;
+        FieldState[][] result = null;
 
         int rowNum = fields.length;
         int colNum = fields[0].length;
@@ -24,7 +25,7 @@ public class ShipShape {
         Arrays.fill(rowsToDelete, false);
         int numberOfRowsToDelete = 0;
 
-        for (int rowIndex = 0; rowIndex < fields.length; rowIndex++) {
+        for (int rowIndex = 0; rowIndex < rowNum; rowIndex++) {
             boolean deleteRow = true;
             for (FieldState fieldState : fields[rowIndex]) {
                 if (fieldState.isUnhitShip()) {
@@ -39,20 +40,67 @@ public class ShipShape {
         }
 
         if (numberOfRowsToDelete != 0) {
-            int newRowNum = fields[0].length - numberOfRowsToDelete;
+            int newRowNum = rowNum - numberOfRowsToDelete;
             if (newRowNum == 0) {
                 throw new IllegalArgumentException("Shape must not be empty");
             }
             result = new FieldState[newRowNum][colNum];
             int actRow = 0;
-            for (int rowIndex = 0; rowIndex < rowsToDelete.length; rowIndex++) {
+            for (int rowIndex = 0; rowIndex < rowNum; rowIndex++) {
                 if (!rowsToDelete[rowIndex]) {
-                    for (FieldState[] fieldStates : fields) {
-                        result[actRow] = fieldStates;
-                    }
+                    result[actRow] = fields[rowIndex];
                     actRow++;
                 }
             }
+        } else {
+            return fields;
+        }
+
+        return result;
+    }
+
+    private FieldState[][] cutVertically(FieldState[][] fields) {
+        FieldState[][] result = null;
+        int rowNum = fields.length;
+        int colNum = fields[0].length;
+
+        boolean colsToDelete[] = new boolean[colNum];
+        Arrays.fill(colsToDelete, false);
+        int numberOfColsToDelete = 0;
+
+        for (int colIndex = 0; colIndex < colNum; colIndex++) {
+            boolean deleteCol = true;
+            for (int rowIndex = 0; rowIndex < rowNum; rowIndex++) {
+                if (fields[rowIndex][colIndex].isUnhitShip()) {
+                    deleteCol = false;
+                    break;
+                }
+            }
+            if (deleteCol) {
+                colsToDelete[colIndex] = true;
+                numberOfColsToDelete++;
+            }
+
+        }
+
+        if (numberOfColsToDelete != 0) {
+            int newColNum = colNum - numberOfColsToDelete;
+            if (newColNum == 0) {
+                throw new IllegalArgumentException("Shape must not be empty");
+            }
+            result = new FieldState[rowNum][newColNum];
+            int actCol = 0;
+            for (int rowIndex = 0; rowIndex < result.length; rowIndex++) {
+                for (int colIndex = 0; colIndex < colNum; colIndex++) {
+                    if (!colsToDelete[colIndex]) {
+                        result[rowIndex][actCol] = fields[rowIndex][colIndex];
+                        actCol++;
+                    }
+                }
+                actCol = 0;
+            }
+        } else {
+            return fields;
         }
         return result;
     }
